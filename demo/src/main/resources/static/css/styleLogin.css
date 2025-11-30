@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --dark-bg: #1e1e1e;       
+    --card-bg: #2e282a;       
+    --accent-color: #aa8855;  
+    --text-light: #e0d8d0;    
+    --text-dark: #aa8855;     
+    --btn-bg: #4c4038;        
+    --font-title: 'Playfair Display', serif;
+    --font-body: 'Cormorant Garamond', serif;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-body);
+}
+
+body * {
+    box-sizing: border-box;
+}
+
+
+.main-login {
+    width: 100vw;
+    height: 100vh;
+    background: var(--dark-bg); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row; /* Garante a divisão Esquerda/Direita */
+    flex-wrap: nowrap; /* Impede a quebra em múltiplas linhas */
+    border: 5px solid var(--accent-color); /* Moldura */
+    padding: 15px;
+}
+
+
+.left-login {
+    width: 50vw; 
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: left;
+    padding: 20px;
+}
+
+.left-login > h1 {
+    color: var(--accent-color); 
+    font-family: var(--font-title);
+    font-size: 2.5vw;
+    line-height: 1.2;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+.left-login-image {
+    max-width: 100%; 
+    height: auto;
+}
+
+
+.right-login {
+    width: 50vw; 
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.card-login {
+    width: 90%;
+    max-width: 400px;
+    background: var(--card-bg); 
+    border-radius: 10px;
+    box-shadow: 0px 15px 40px rgba(0, 0, 0, 0.5); 
+    border: 1px solid var(--accent-color); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 30px 35px;
+}
+
+.card-login > h1 {
+    color: var(--accent-color); 
+    font-family: var(--font-title);
+    font-weight: 800;
+    margin: 0;
+    padding: 30px;
+    font-size: 3em;
+    letter-spacing: 5px; 
+}
+
+.card-login > p {
+    color: var(--text-light);
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 17px 0;
+    margin: 15px 0; 
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text-light); 
+    background-color: var(--btn-bg); 
+    cursor: pointer;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--accent-color); 
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-login:hover {
+    background-color: var(--accent-color); 
+    color: var(--dark-bg); 
+    transform: translateY(-2px);
+}
+
+.rodape {
+    color: var(--text-light);
+    margin-top: 20px;
+}
+
+.rodape a {
+    text-decoration: none;
+    color: var(--accent-color); 
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.rodape a:hover {
+    color: var(--text-light);
+}
+
+
+
+@media only screen and (max-width: 1024px) {
+    
+    .left-login > h1 {
+        font-size: 3vw;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    
+    .left-login > h1 {
+        font-size: 22px; 
+        text-align: center; 
+    }
+
+    
+    .card-login {
+        padding: 20px 25px;
+    }
+    
+    .card-login > h1 {
+        font-size: 2em;
+        padding: 15px 0;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .btn-login {
+        font-size: 14px;
+        padding: 14px 0;
+    }
+}
+
+.left-login-image {
+    max-width: 350px; 
+    height: auto; 
+    display: block; 
+    margin: 0 auto;
+}
+
+/* =========================================
+   ESTILIZAÇÃO DO INPUT DE MESA (#mesaInput)
+   ========================================= */
+
+#mesaInput {
+    /* Layout */
+    width: 90%; /* Ocupa toda a largura do card */
+    padding: 15px 10px;
+    margin: 10px 0 20px 0; /* Espaçamento: 10px em cima, 20px embaixo */
+    box-sizing: border-box; 
+    
+    /* Aparência */
+    border: 2px solid #ddd; /* Borda mais clara e visível */
+    border-radius: 12px; /* Cantos bem arredondados */
+    background-color: #f7f7f7; /* Fundo levemente cinza */
+    color: #333;
+    font-size: 1.0em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    outline: none;
+}
+
+#mesaInput::placeholder {
+    color: #aaa; /* Cor suave para o placeholder */
+}
+
+/* Estado de Foco (quando o usuário clica) */
+#mesaInput:focus {
+    border-color: var(--text-dark); 
+    box-shadow: 0 0 0 4px rgba(255, 152, 0, 0.2); 
+    background-color: #fff; 
+}
+
+/* Remover setas do input type="number" (Geralmente preferível em mobile) */
+#mesaInput::-webkit-outer-spin-button,
+#mesaInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

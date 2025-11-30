@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cardápio</title>
+    <link rel="stylesheet" href="../css/styleLogin.css">
+    <style>
+        table { width: 100%; background: #fff; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+        .topo { margin-bottom: 20px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align:center;">Cardápio</h1>
+
+<div class="topo">
+    <button class="btn-login" onclick="history.back()">⬅ Voltar</button>
+    <button class="btn-login">Adicionar Item</button>
+</div>
+
+<table id="tabela-cardapio">
+
+    <tr>
+        <th>Nome</th>
+        <th>Categoria</th>
+        <th>Preço</th>
+        <th>Ações</th>
+    </tr>
+
+    <tr>
+        <td>Cerveja</td>
+        <td>Bebida</td>
+        <td>R$ 12,00</td>
+        <td>
+            <button class="btn-login">Editar</button>
+            <button class="btn-login">Excluir</button>
+        </td>
+    </tr>
+
+    <tr>
+        <td>Batata Frita</td>
+        <td>Comida</td>
+        <td>R$ 22,00</td>
+        <td>
+            <button class="btn-login">Editar</button>
+            <button class="btn-login">Excluir</button>
+        </td>
+    </tr>
+</table>
+
+<script src="../js/admin.js"></script>
+<script>carregarCardapio();</script>
+
+</body>
+</html>

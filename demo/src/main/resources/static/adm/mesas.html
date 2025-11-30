@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciar Mesas</title>
+    <link rel="stylesheet" href="../css/styleLogin.css">
+    <style>
+        table { width: 100%; background: #fff; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+        .topo { margin-bottom: 20px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align:center;">Mesas</h1>
+
+<div class="topo">
+    <button class="btn-login" onclick="history.back()">⬅ Voltar</button>
+    <button class="btn-login">Adicionar Mesa</button>
+</div>
+
+<table>
+    <tr>
+        <th>Número</th>
+        <th>Status</th>
+        <th>Ações</th>
+    </tr>
+
+    <tr>
+        <td>1</td>
+        <td>Livre</td>
+        <td>
+            <button class="btn-login">Editar</button>
+            <button class="btn-login">Excluir</button>
+        </td>
+    </tr>
+
+    <tr>
+        <td>2</td>
+        <td>Ocupada</td>
+        <td>
+            <button class="btn-login">Editar</button>
+            <button class="btn-login">Excluir</button>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

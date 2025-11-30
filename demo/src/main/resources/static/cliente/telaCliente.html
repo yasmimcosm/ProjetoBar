@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar como Cliente</title>
+    <link rel="stylesheet" href="../css/styleLogin.css">
+</head>
+<body>
+
+<div class="main-login">
+    <div class="left-login">
+        <h1>Bem-vindo ao Restaurante</h1>
+        <img src="../img/logo.png" alt="Logo" class="left-login-image">
+    </div>
+
+    <div class="right-login">
+        <div class="card-login">
+            <h1>CLIENTE</h1>
+            <p>Escaneie o QR Code da mesa ou digite o número:</p>
+
+            <input type="number" id="mesaInput" placeholder="Número da mesa">
+
+            <button class="btn-login" onclick="entrarMesa()">Entrar</button>
+
+            <button class="btn-login" onclick="location.href='../index.html'">
+                Voltar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function entrarMesa() {
+    const mesa = document.getElementById("mesaInput").value;
+
+    if (!mesa) {
+        alert("Digite o número da mesa.");
+        return;
+    }
+
+    // Redireciona para a página de consumo com o número da mesa
+    window.location.href = `consumo.html?mesa=${mesa}`;
+}
+</script>
+
+</body>
+</html>

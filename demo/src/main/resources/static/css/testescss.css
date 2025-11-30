@@ -1,0 +1,165 @@
+/* Definições de Cores e Fontes */
+:root {
+    --dark-brown: #2e282a; /* Cor de fundo escura, quase preta */
+    --accent-color: #aa8855; /* Cor de destaque (ouro/cobre) */
+    --light-text: #e0d8d0; /* Cor do texto claro */
+    --category-bg: #4c4038; /* Fundo mais escuro para os títulos das categorias */
+    --font-primary: 'Playfair Display', serif; /* Exemplo de fonte elegante */
+    --font-secondary: 'Open Sans', sans-serif; /* Exemplo de fonte de leitura */
+}
+
+/* Estilo Básico */
+body {
+    background-color: var(--dark-brown);
+    color: var(--light-text);
+    font-family: var(--font-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* === SEÇÃO DE CAPA/HEADER === */
+.hero-section {
+    background-color: var(--dark-brown);
+    min-height: 100vh; /* Ocupa a altura total da tela */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 20px;
+    /* Linha de borda (imitando a moldura) */
+    border: 5px solid var(--accent-color);
+    margin: 15px; /* Para mostrar a borda com um pequeno espaço */
+}
+
+.main-title {
+    text-align: center;
+    /* Estilo de fonte para "MENU RESTAURANT" */
+}
+
+.logo {
+    font-family: var(--font-primary);
+    font-size: 3.5em;
+    color: var(--accent-color);
+    letter-spacing: 5px;
+    margin-bottom: 0.1em;
+}
+
+.subtitle {
+    font-size: 2em;
+    font-weight: normal;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    padding: 5px 15px;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+/* Os ornamentos de canto são mais complexos. 
+   Na web, eles seriam SVGs ou ícones de fonte, 
+   ou você pode usar pseudo-elementos (::before/::after) com imagens de fundo.
+   Exemplo simplificado para a posição:
+*/
+.ornament {
+    /* ... (Estilização de ornamento, posição absoluta dentro do .hero-section) */
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    /* Para simular: */
+    /* border: 2px solid var(--accent-color);
+    border-radius: 50%; */
+}
+.top-left { top: 20px; left: 20px; }
+.top-right { top: 20px; right: 20px; }
+/* ... e assim por diante ... */
+
+
+/* === SEÇÃO DO MENU (a página da esquerda) === */
+.menu-section {
+    display: grid;
+    /* Cria 2 colunas: a coluna de conteúdo (menu) e a coluna do divisor vertical/ornamento */
+    grid-template-columns: 3fr 1fr;
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 20px;
+    position: relative;
+}
+
+.menu-category {
+    margin-bottom: 40px;
+    /* Alinha o texto do menu à esquerda (na primeira coluna do grid) */
+    padding-right: 50px; 
+}
+
+.category-title {
+    background-color: var(--category-bg);
+    color: var(--light-text);
+    padding: 8px 15px;
+    display: inline-block;
+    font-family: var(--font-primary);
+    font-size: 1.5em;
+    margin-bottom: 25px;
+    border: 1px solid var(--accent-color); /* Borda sutil como na imagem */
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1); /* Linha divisória sutil */
+    margin-bottom: 15px;
+}
+
+.item-name {
+    font-style: italic;
+    flex-grow: 1;
+    padding-right: 15px;
+}
+
+.item-price {
+    color: var(--accent-color);
+    font-weight: bold;
+    white-space: nowrap; /* Garante que o preço não quebre a linha */
+}
+
+/* Divisor Vertical (a linha e o ornamento à direita) */
+.vertical-divider {
+    grid-column: 2 / 3; /* Coloca na segunda coluna */
+    position: relative;
+    /* Linha vertical */
+    border-left: 1px solid var(--accent-color);
+    margin-top: 10px;
+}
+
+.vertical-divider::before {
+    content: '';
+    /* Este pseudo-elemento seria o ornamento circular */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    /* Simulação: */
+    border: 2px solid var(--accent-color);
+    border-radius: 50%;
+    background-color: var(--dark-brown);
+}
+
+/* Responsividade Básica */
+@media (max-width: 768px) {
+    .hero-section {
+        /* Altura menor em telas menores */
+        min-height: 50vh; 
+    }
+    .menu-section {
+        /* Em telas menores, o divisor vertical some e o menu ocupa 1 coluna */
+        grid-template-columns: 1fr;
+    }
+    .vertical-divider {
+        display: none;
+    }
+    .menu-category {
+        padding-right: 0;
+    }
+}

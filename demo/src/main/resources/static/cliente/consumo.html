@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumo da Mesa</title>
+    <link rel="stylesheet" href="css/consumo.css">
+
+    <script>
+    window.onload = () => {
+        const params = new URLSearchParams(window.location.search);
+        const mesa = params.get("mesa") || "?";
+        document.getElementById("tituloMesa").innerText = "Mesa " + mesa;
+    }
+    </script>
+</head>
+<body>
+
+<header id="tituloMesa">Mesa</header>
+
+<div class="conteudo">
+    <h2>Consumo:</h2>
+
+    <p>Itens consumidos aparecerão aqui...</p>
+
+    <!-- depois você coloca lista, total, gorjeta etc -->
+</div>
+
+</body>
+</html>
