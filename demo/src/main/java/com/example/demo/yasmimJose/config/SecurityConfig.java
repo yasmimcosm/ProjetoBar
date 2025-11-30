@@ -3,61 +3,41 @@ package com.example.demo.yasmimJose.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Importação necessária
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+// Imports não utilizados removidos para clareza
 
 @Configuration
 public class SecurityConfig {
 
+    // =======================================================
+    // 1. CORREÇÃO: Método Bean para BCryptPasswordEncoder
+    // =======================================================
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Configuração de CORS
+    // =======================================================
+    // 2. Configuração do FilterChain (Com correções de sintaxe)
+    // =======================================================
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(
-                                "http://127.0.0.1:5500",
-                                "http://localhost:5500",
-                                "http://localhost:3000"
-                        )
-                        .allowedMethods("*")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
-    }
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    // Configuração de segurança
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // desabilita CSRF para testes locais
+                // Desabilita o CSRF (Lambda DSL)
+                .csrf(csrf -> csrf.disable())
+
+                // Configuração da Autorização
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/criar", "/cliente/**", "/css/**", "/img/**").permitAll() // público
-                        .requestMatchers("/adm/**").hasRole("ADMIN") // somente admin
-                        .requestMatchers("/garcom/**").hasRole("GARCOM") // somente garçom
-                        .anyRequest().authenticated() // todo o resto precisa de login
+                        .anyRequest().permitAll() // Permite todas as requisições
                 )
-                .formLogin(form -> form
-                        .loginPage("/login")       // sua página de login customizada
-                        .defaultSuccessUrl("/admEntrada.html", true) // redireciona admin após login
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/index.html")
-                        .permitAll()
-                );
+
+                // Desabilita FormLogin e Logout
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable());
 
         return http.build();
     }
 }
-
