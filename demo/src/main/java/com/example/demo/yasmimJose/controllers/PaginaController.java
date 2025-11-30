@@ -4,10 +4,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class AdminSenhaController {
+public class PaginaController {
 
     @GetMapping("/adminSenha")
     public String adminSenha() {
-        return "adminSenha"; // abre o adminSenha.html em templates
+        return "adminSenha"; // abre adminSenha.html em templates
     }
 }
+

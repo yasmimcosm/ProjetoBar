@@ -20,12 +20,10 @@ async function carregarCardapio() {
 }
 
 function verificarSenha() {
-    const senhaDigitada = document.getElementById("senha").value;
+    let senha = document.getElementById("senha").value;
 
-    const senhaCorreta = "admin123"; // você escolhe
-
-    if (senhaDigitada === senhaCorreta) {
-        window.location.href = "/admEntrada.html";
+    if (senha === "admin123") {
+        window.location.href = "/adm/admEntrada.html";
     } else {
         document.getElementById("msg").textContent = "Senha incorreta!";
     }
