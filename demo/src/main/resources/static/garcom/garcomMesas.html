@@ -5,39 +5,123 @@
     <title>Mesas Abertas</title>
     <link rel="stylesheet" href="../css/styleLogin.css">
     <style>
-        table { width: 100%; background: #fff; margin-top:20px; }
+        table { width: 100%; background: #fff; margin-top:20px; border-collapse: collapse; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
         .topo { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .btn-login { margin: 2px; }
     </style>
 </head>
-<body>
+<body id="mesas">
 
 <h1 style="text-align:center;">Mesas Abertas</h1>
 
 <div class="topo">
-    <button class="btn-login" onclick="location.href='index.html'">⬅ Menu</button>
+    <button class="btn-login" onclick="location.href='/index.html'">⬅ Menu</button>
     <button class="btn-login" onclick="location.href='abrir.html'">Abrir Mesa</button>
 </div>
 
-<table>
+<table id="tabelaMesas">
     <tr>
         <th>Mesa</th>
         <th>Pessoas</th>
         <th>Ações</th>
     </tr>
-
-    <tr>
-        <td>5</td>
-        <td>3</td>
-        <td>
-            <button class="btn-login" onclick="location.href='pedidos.html'">Adicionar Item</button>
-            <button class="btn-login">Remover Item</button>
-            <button class="btn-login">Couvert ON/OFF</button>
-            <button class="btn-login">Fechar Conta</button>
-        </td>
-    </tr>
-
 </table>
+
+<script>
+    const API = "http://localhost:8080/api/conta"; // ajustado para ContaController
+    let mesas = []; // para guardar mesas abertas
+
+    // ----------------------------
+    // CARREGAR MESAS ABERTAS
+    // ----------------------------
+    async function carregarMesas() {
+        const resp = await fetch(`${API}/abertas`);
+        mesas = await resp.json();
+
+        const tabela = document.getElementById("tabelaMesas");
+        tabela.innerHTML = `
+            <tr>
+                <th>Mesa</th>
+                <th>Pessoas</th>
+                <th>Ações</th>
+            </tr>
+        `;
+
+        mesas.forEach(conta => {
+            tabela.innerHTML += `
+                <tr>
+                    <td>${conta.mesa.numero}</td>
+                    <td>${conta.numeroPessoas}</td>
+                    <td>
+                        <button class="btn-login" onclick="editarMesa(${conta.id})">Editar Itens</button>
+                        <button class="btn-login" onclick="removerMesa(${conta.id})">Excluir Mesa</button>
+                        <button class="btn-login" onclick="fecharConta(${conta.id})">Fechar Conta</button>
+                        <button class="btn-login" onclick="registrarPagamentoPrompt(${conta.id})">Registrar Pagamento</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // ----------------------------
+    // EDITAR ITENS DA MESA
+    // ----------------------------
+    function editarMesa(contaId) {
+        localStorage.setItem("mesaSelecionada", contaId);
+        window.location.href = "pedidos.html";
+    }
+
+    // ----------------------------
+    // REMOVER MESA (CANCELAR CONTA)
+    // ----------------------------
+    async function removerMesa(contaId) {
+        if (!confirm("Deseja realmente excluir esta mesa?")) return;
+        await fetch(`${API}/${contaId}`, { method: "DELETE" });
+        alert("Mesa removida!");
+        carregarMesas();
+    }
+
+    // ----------------------------
+    // FECHAR CONTA
+    // ----------------------------
+    async function fecharConta(contaId) {
+        await fetch(`${API}/${contaId}/fechar`, { method: "PATCH" });
+        alert("Conta fechada!");
+        carregarMesas();
+    }
+
+    // ----------------------------
+    // REGISTRAR PAGAMENTO
+    // ----------------------------
+    async function registrarPagamentoPrompt(contaId) {
+        const valor = parseFloat(prompt("Digite o valor do pagamento:"));
+        if (isNaN(valor) || valor <= 0) return alert("Valor inválido!");
+
+        await fetch(`${API}/${contaId}/pagamento?valor=${valor}`, { method: "PATCH" });
+        alert("Pagamento registrado!");
+        carregarMesas();
+    }
+
+    // ----------------------------
+    // CANCELAR PEDIDO COM MOTIVO
+    // ----------------------------
+    async function cancelarPedido(contaId, pedidoId) {
+        const motivo = prompt("Informe o motivo do cancelamento:");
+        if (!motivo) return alert("Cancelamento cancelado!");
+
+        await fetch(`${API}/${contaId}/pedidos/${pedidoId}/cancelar?motivo=${encodeURIComponent(motivo)}`, {
+            method: "PATCH"
+        });
+        alert("Pedido cancelado!");
+        carregarMesas();
+    }
+
+    // ----------------------------
+    // ONLOAD
+    // ----------------------------
+    window.onload = carregarMesas;
+</script>
 
 </body>
 </html>

@@ -5,67 +5,53 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "pedido")
 public class Pedido {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String nome; // nome do item
+    private Double preco;
+    private Integer quantidade;
+
     @ManyToOne
     private Conta conta;
 
-    @ManyToOne
-    private Item item; // substituído ItemCardapio por Item
+    private Long itemId; // referência ao item do cardápio
 
-    private Integer quantidade;
-    private Double precoUnit;
-    private Double subtotal;
-    private String status; // ATIVO, CANCELADO
-    private String justificativaCancelamento;
+    private String motivoCancelamento; // novo campo
 
     public Pedido() {}
 
-    public Pedido(Conta conta, Item item, Integer quantidade) {
-        this.conta = conta;
-        this.item = item;
+    public Pedido(String nome, Double preco, Integer quantidade, Conta conta, Long itemId) {
+        this.nome = nome;
+        this.preco = preco;
         this.quantidade = quantidade;
-        this.precoUnit = item.getPreco();
-        this.subtotal = this.precoUnit * this.quantidade;
-        this.status = "ATIVO";
+        this.conta = conta;
+        this.itemId = itemId;
+
+
     }
 
-    // Getters e Setters
+    // getters e setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public Double getPreco() { return preco; }
+    public void setPreco(Double preco) { this.preco = preco; }
+
+    public Integer getQuantidade() { return quantidade; }
+    public void setQuantidade(Integer quantidade) { this.quantidade = quantidade; }
+
+    public Long getItemId() { return itemId; }
+    public void setItemId(Long itemId) { this.itemId = itemId; }
 
     public Conta getConta() { return conta; }
     public void setConta(Conta conta) { this.conta = conta; }
 
-    public Item getItem() { return item; }
-    public void setItem(Item item) { this.item = item; }
-
-    public Integer getQuantidade() { return quantidade; }
-    public void setQuantidade(Integer quantidade) {
-        this.quantidade = quantidade;
-        atualizarSubtotal(); // recalcula subtotal ao alterar quantidade
-    }
-
-    public Double getPrecoUnit() { return precoUnit; }
-    public void setPrecoUnit(Double precoUnit) { this.precoUnit = precoUnit; }
-
-    public Double getSubtotal() { return subtotal; }
-    public void setSubtotal(Double subtotal) { this.subtotal = subtotal; }
-
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-
-    public String getJustificativaCancelamento() { return justificativaCancelamento; }
-    public void setJustificativaCancelamento(String justificativaCancelamento) {
-        this.justificativaCancelamento = justificativaCancelamento;
-    }
-
-    // Método auxiliar para recalcular subtotal
-    public void atualizarSubtotal() {
-        if (this.precoUnit != null && this.quantidade != null) {
-            this.subtotal = this.precoUnit * this.quantidade;
-        }
-    }
+    public String getMotivoCancelamento() { return motivoCancelamento; }
+    public void setMotivoCancelamento(String motivoCancelamento) { this.motivoCancelamento = motivoCancelamento; }
 }

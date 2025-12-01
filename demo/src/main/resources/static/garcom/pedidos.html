@@ -2,42 +2,188 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Adicionar Itens</title>
+    <title>Editar Mesa</title>
     <link rel="stylesheet" href="../css/styleLogin.css">
     <style>
-        table { width: 100%; background: #fff; margin-top:20px; }
+        table { width: 100%; background: #fff; margin-top:20px; border-collapse: collapse; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
+        .topo { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .btn-login { margin: 2px; }
+        input[type=number] { width: 60px; }
     </style>
 </head>
-<body>
+<body id="pedidos">
 
-<h1 style="text-align:center;">Adicionar Itens à Mesa</h1>
+<h1 style="text-align:center;">Mesa Selecionada</h1>
 
-<button class="btn-login" onclick="history.back()">⬅ Voltar</button>
+<div class="topo">
+    <button class="btn-login" onclick="location.href='garcomMesas.html'">⬅ Voltar</button>
+    <button class="btn-login" onclick="registrarPagamento()">Registrar Pagamento</button>
+    <button class="btn-login" onclick="toggleCouvert()">Couvert ON/OFF</button>
+    <button class="btn-login" onclick="fecharConta()">Fechar Conta</button>
+</div>
 
-<table>
+<h2>Pedidos da Mesa</h2>
+<table id="tabelaPedidos">
+    <tr>
+        <th>Item</th>
+        <th>Preço</th>
+        <th>Qtd</th>
+        <th>Ações</th>
+    </tr>
+</table>
+
+<h2>Cardápio</h2>
+<table id="tabelaCardapio">
     <tr>
         <th>Item</th>
         <th>Categoria</th>
         <th>Preço</th>
         <th>Ação</th>
     </tr>
-
-    <tr>
-        <td>Cerveja</td>
-        <td>Bebida</td>
-        <td>R$ 12,00</td>
-        <td><button class="btn-login">Adicionar</button></td>
-    </tr>
-
-    <tr>
-        <td>Batata Frita</td>
-        <td>Comida</td>
-        <td>R$ 22,00</td>
-        <td><button class="btn-login">Adicionar</button></td>
-    </tr>
-
 </table>
 
+<script>
+    const API = "http://localhost:8080/api/conta"; // padronizado
+    let mesaSelecionada = localStorage.getItem("mesaSelecionada");
+
+    // ----------------------------
+    // CARREGAR PEDIDOS DA MESA
+    // ----------------------------
+    async function carregarPedidos() {
+        const resp = await fetch(`${API}/${mesaSelecionada}/pedidos`);
+        const pedidos = await resp.json();
+        const tabela = document.getElementById("tabelaPedidos");
+        tabela.innerHTML = `
+            <tr>
+                <th>Item</th>
+                <th>Preço</th>
+                <th>Qtd</th>
+                <th>Ações</th>
+            </tr>
+        `;
+
+        pedidos.forEach(p => {
+            tabela.innerHTML += `
+                <tr>
+                    <td>${p.nome}</td>
+                    <td>R$ ${p.preco.toFixed(2)}</td>
+                    <td>${p.quantidade}</td>
+                    <td>
+                        <button class="btn-login" onclick="cancelarPedido(${p.id})">Cancelar</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // ----------------------------
+    // CARREGAR CARDÁPIO
+    // ----------------------------
+    async function carregarCardapio() {
+        const resp = await fetch("http://localhost:8080/api/cardapio");
+        const itens = await resp.json();
+        const tabela = document.getElementById("tabelaCardapio");
+        tabela.innerHTML = `
+            <tr>
+                <th>Item</th>
+                <th>Categoria</th>
+                <th>Preço</th>
+                <th>Ação</th>
+            </tr>
+        `;
+
+        itens.forEach(item => {
+            tabela.innerHTML += `
+                <tr>
+                    <td>${item.nome}</td>
+                    <td>${item.categoria}</td>
+                    <td>R$ ${item.preco.toFixed(2)}</td>
+                    <td>
+                        <button class="btn-login" onclick="adicionarPedido(${item.id}, '${item.nome}', ${item.preco})">Adicionar</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // ----------------------------
+    // ADICIONAR PEDIDO
+    // ----------------------------
+    async function adicionarPedido(itemId, nome, preco) {
+        const pedido = { itemId, nome, preco, quantidade: 1 };
+        await fetch(`${API}/${mesaSelecionada}/pedidos`, {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(pedido)
+        });
+        alert(`Item "${nome}" adicionado!`);
+        carregarPedidos();
+    }
+
+    // ----------------------------
+    // CANCELAR PEDIDO COM MOTIVO
+    // ----------------------------
+    async function cancelarPedido(pedidoId) {
+        const motivo = prompt("Digite o motivo do cancelamento:");
+        if (!motivo) return alert("Cancelamento precisa de motivo!");
+
+        await fetch(`${API}/${mesaSelecionada}/pedidos/${pedidoId}/cancelar?motivo=${encodeURIComponent(motivo)}`, {
+            method: "PATCH"
+        });
+        alert("Pedido cancelado!");
+        carregarPedidos();
+    }
+
+    // ----------------------------
+    // COUVERT ON/OFF
+    // ----------------------------
+    async function toggleCouvert() {
+        const resp = await fetch(`${API}/${mesaSelecionada}`);
+        const conta = await resp.json();
+        const valor = conta.pagarCouvert ? 0 : 5;
+        const url = conta.pagarCouvert
+            ? `${API}/${mesaSelecionada}/couvert/remover`
+            : `${API}/${mesaSelecionada}/couvert?valor=${valor}`;
+
+        await fetch(url, { method: "PATCH" });
+        alert("Couvert atualizado!");
+        carregarPedidos();
+    }
+
+    // ----------------------------
+    // REGISTRAR PAGAMENTO
+    // ----------------------------
+    async function registrarPagamento() {
+        const valor = parseFloat(prompt("Digite o valor do pagamento:"));
+        if (!valor || valor <= 0) return alert("Valor inválido!");
+
+        await fetch(`${API}/${mesaSelecionada}/pagamento?valor=${valor}`, { method: "PATCH" });
+        alert("Pagamento registrado!");
+    }
+
+    // ----------------------------
+    // FECHAR CONTA
+    // ----------------------------
+    async function fecharConta() {
+        if (!confirm("Deseja fechar a conta e liberar a mesa?")) return;
+        await fetch(`${API}/${mesaSelecionada}/fechar`, { method: "PATCH" });
+        alert("Conta fechada!");
+        window.location.href = "garcomMesas.html";
+    }
+
+    // ----------------------------
+    // ONLOAD
+    // ----------------------------
+    window.onload = () => {
+        if (!mesaSelecionada) {
+            alert("Nenhuma mesa selecionada!");
+            window.location.href = "garcomMesas.html";
+        } else {
+            carregarPedidos();
+            carregarCardapio();
+        }
+    };
+</script>
 </body>
 </html>

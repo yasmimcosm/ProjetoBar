@@ -8,9 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface MesaRepository extends JpaRepository<Mesa, Long> {
-
-    // Busca mesa pelo número (único)
-    Optional<Mesa> findByNumero(Integer numero);
-
-    // Outros métodos CRUD já estão disponíveis: save, findAll, findById, deleteById
+    Optional<Mesa> findByNumero(int numero);
 }

@@ -11,6 +11,4 @@ public class DemoApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
 	}
-
-	// cria 2 usuários padrão no bootstrap (se não existirem)
 }

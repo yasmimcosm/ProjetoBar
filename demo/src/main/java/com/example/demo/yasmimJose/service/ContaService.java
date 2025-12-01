@@ -1,173 +1,86 @@
 package com.example.demo.yasmimJose.service;
 
-import com.example.demo.yasmimJose.model.*;
-import com.example.demo.yasmimJose.repository.*;
+import com.example.demo.yasmimJose.model.Conta;
+import com.example.demo.yasmimJose.model.Pedido;
+import com.example.demo.yasmimJose.repository.ContaRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ContaService {
 
-    private final ContaRepository contaRepo;
-    private final MesaRepository mesaRepo;
-    private final ItemRepository itemRepo; // antes ItemCardapioRepository
-    private final PedidoRepository pedidoRepo;
-    private final PagamentoRepository pagamentoRepo;
+    private final ContaRepository contaRepository;
 
-    public ContaService(ContaRepository contaRepo, MesaRepository mesaRepo,
-                        ItemRepository itemRepo, PedidoRepository pedidoRepo,
-                        PagamentoRepository pagamentoRepo) {
-        this.contaRepo = contaRepo;
-        this.mesaRepo = mesaRepo;
-        this.itemRepo = itemRepo;
-        this.pedidoRepo = pedidoRepo;
-        this.pagamentoRepo = pagamentoRepo;
+    public ContaService(ContaRepository contaRepository) {
+        this.contaRepository = contaRepository;
     }
 
-    @Transactional
-    public Conta abrirConta(Long mesaId) {
-        Mesa mesa = mesaRepo.findById(mesaId)
-                .orElseThrow(() -> new RuntimeException("Mesa não encontrada"));
-
-        if (mesa.getDisponivel() != null && !mesa.getDisponivel()) {
-            throw new RuntimeException("Mesa já ocupada");
-        }
-
-        Conta conta = new Conta(mesa);
-        mesa.setDisponivel(false);
-
-        contaRepo.save(conta);
-        mesaRepo.save(mesa);
-
-        return conta;
+    // ---------------- Get conta por ID ----------------
+    public Conta getConta(Long id) {
+        return contaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Conta não encontrada"));
     }
 
-    @Transactional
-    public Pedido adicionarPedido(Long contaId, Long itemId, Integer quantidade) {
-        Conta conta = contaRepo.findById(contaId)
-                .orElseThrow(() -> new RuntimeException("Conta não existe"));
-
-        if (!"ABERTA".equals(conta.getStatus())) throw new RuntimeException("Conta não está aberta");
-
-        Item item = itemRepo.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item não existe"));
-
-        if (quantidade == null || quantidade <= 0) quantidade = 1;
-
-        Pedido p = new Pedido(conta, item, quantidade);
-        conta.getPedidos().add(p);
-
-        pedidoRepo.save(p);
-        recalcularTotal(conta);
-        contaRepo.save(conta);
-
-        return p;
+    // ---------------- Salvar ou atualizar conta ----------------
+    public Conta salvar(Conta conta) {
+        return contaRepository.save(conta);
     }
 
-    @Transactional
-    public Pedido cancelarPedido(Long contaId, Long pedidoId, String justificativa) {
-        Conta conta = contaRepo.findById(contaId)
-                .orElseThrow(() -> new RuntimeException("Conta não existe"));
-
-        Pedido p = pedidoRepo.findById(pedidoId)
-                .orElseThrow(() -> new RuntimeException("Pedido não existe"));
-
-        p.setStatus("CANCELADO");
-        p.setJustificativaCancelamento(justificativa);
-
-        pedidoRepo.save(p);
-        recalcularTotal(conta);
-        contaRepo.save(conta);
-
-        return p;
+    // ---------------- Pedidos ----------------
+    public List<Pedido> listarPedidos(Long contaId) {
+        Conta conta = getConta(contaId);
+        return conta.getPedidos();
     }
 
-    @Transactional
-    public Conta ativarCouvert(Long contaId, boolean ativo, Double valor) {
-        Conta conta = contaRepo.findById(contaId)
-                .orElseThrow(() -> new RuntimeException("Conta não existe"));
-
-        conta.setCouvertAtivo(ativo);
-        conta.setCouvertValor(ativo ? (valor != null ? valor : conta.getCouvertValor()) : 0.0);
-
-        recalcularTotal(conta);
-        contaRepo.save(conta);
-
-        return conta;
+    public Pedido adicionarPedido(Long contaId, Pedido pedido) {
+        Conta conta = getConta(contaId);
+        conta.adicionarPedido(pedido);
+        salvar(conta);
+        return pedido;
     }
 
-    @Transactional
-    public Conta definirGorjeta(Long contaId, Double percentual) {
-        Conta conta = contaRepo.findById(contaId)
-                .orElseThrow(() -> new RuntimeException("Conta não existe"));
-
-        conta.setGorjetaPercentual(percentual != null ? percentual : 0.0);
-        recalcularTotal(conta);
-        contaRepo.save(conta);
-
-        return conta;
+    public void removerPedido(Long contaId, Long pedidoId) {
+        Conta conta = getConta(contaId);
+        Pedido pedido = conta.getPedidos().stream()
+                .filter(p -> p.getId().equals(pedidoId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        conta.removerPedido(pedido);
+        salvar(conta);
     }
 
-    @Transactional
-    public Conta fecharConta(Long contaId) {
-        Conta conta = contaRepo.findById(contaId)
-                .orElseThrow(() -> new RuntimeException("Conta não existe"));
+    // ---------------- Cancelar pedido com motivo ----------------
+    public void cancelarPedido(Long contaId, Long pedidoId, String motivo) {
+        Conta conta = getConta(contaId);
+        Pedido pedido = conta.getPedidos().stream()
+                .filter(p -> p.getId().equals(pedidoId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
 
-        if (!"ABERTA".equals(conta.getStatus()))
-            throw new RuntimeException("Conta não está aberta");
+        // registra motivo de cancelamento
+        pedido.setMotivoCancelamento(motivo);
 
-        recalcularTotal(conta);
-        conta.setFechadoEm(java.time.LocalDateTime.now());
-        conta.setStatus("FECHADA");
+        // opcional: atualizar total da conta
+        double valorTotal = pedido.getPreco() * pedido.getQuantidade();
+        conta.setTotal(Math.max(conta.getTotal() - valorTotal, 0));
 
-        Mesa mesa = conta.getMesa();
-        mesa.setDisponivel(true);
-        mesaRepo.save(mesa);
-
-        contaRepo.save(conta);
-        return conta;
+        // remove pedido da lista ativa (pode manter histórico se quiser)
+        conta.removerPedido(pedido);
+        salvar(conta);
     }
 
-    @Transactional
-    public Pagamento registrarPagamento(Long contaId, Double valor, String tipo, boolean parcial) {
-        Conta conta = contaRepo.findById(contaId)
-                .orElseThrow(() -> new RuntimeException("Conta não existe"));
-
-        double saldo = calcularSaldoRestante(conta);
-        if (valor <= 0) throw new RuntimeException("Valor inválido");
-
-        if (!parcial && valor < saldo) parcial = true;
-
-        Pagamento pag = new Pagamento(conta, valor, tipo, parcial);
-        pagamentoRepo.save(pag);
-        conta.getPagamentos().add(pag);
-        contaRepo.save(conta);
-
-        return pag;
+    // ---------------- Pagamento ----------------
+    public void registrarPagamento(Long contaId, double valor) {
+        Conta conta = getConta(contaId);
+        conta.registrarPagamento(valor);
+        salvar(conta);
     }
 
-    @Transactional(readOnly = true)
-    public Conta getConta(Long contaId) {
-        return contaRepo.findById(contaId)
-                .orElseThrow(() -> new RuntimeException("Conta não existe"));
-    }
-
-    // helpers
-    private void recalcularTotal(Conta conta) {
-        double somaItens = conta.getPedidos().stream()
-                .filter(p -> "ATIVO".equals(p.getStatus()))
-                .mapToDouble(Pedido::getSubtotal).sum();
-
-        double couvert = conta.isCouvertAtivo() ? (conta.getCouvertValor() != null ? conta.getCouvertValor() : 0.0) : 0.0;
-        double gorjeta = (conta.getGorjetaPercentual() != null ? conta.getGorjetaPercentual() : 0.0) * somaItens / 100.0;
-        double total = somaItens + couvert + gorjeta;
-        conta.setTotal(total);
-    }
-
-    @Transactional(readOnly = true)
-    public double calcularSaldoRestante(Conta conta) {
-        double pagos = conta.getPagamentos().stream().mapToDouble(Pagamento::getValor).sum();
-        double saldo = conta.getTotal() - pagos;
-        return saldo < 0 ? 0.0 : saldo;
+    // ---------------- Fechar conta ----------------
+    public void fecharConta(Long contaId) {
+        Conta conta = getConta(contaId);
+        conta.fecharConta();
+        salvar(conta);
     }
 }

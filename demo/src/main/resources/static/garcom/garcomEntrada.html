@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Garçom - Menu</title>
-    <link rel="stylesheet" href="../css/styleLogin.css">
+    <!-- CSS corrigido para caminho absoluto -->
+    <link rel="stylesheet" href="/css/styleLogin.css">
 </head>
 <body>
 
 <div class="main-login">
     <div class="left-login">
         <h1>Painel do Garçom</h1>
-        <img src="../animate.svg" class="left-login-image" alt="">
+        <!-- SVG ou imagem animada -->
+        <img src="/animate.svg" class="left-login-image" alt="">
     </div>
 
     <div class="right-login">
@@ -19,11 +21,10 @@
 
             <h1>GARÇOM</h1>
 
-            <button class="btn-login" onclick="location.href='mesas.html'">Mesas Abertas</button>
-            <button class="btn-login" onclick="location.href='abrir.html'">Abrir Mesa</button>
-            <button class="btn-login" onclick="location.href='../index.html'">
-                Voltar
-            </button>
+            <!-- Botões apontando para os HTMLs corretos -->
+            <button class="btn-login" onclick="location.href='/garcom/garcomMesas.html'">Mesas Abertas</button>
+            <button class="btn-login" onclick="location.href='/garcom/abrir.html'">Abrir Mesa</button>
+            <button class="btn-login" onclick="location.href='index.html'">Voltar</button>
 
         </div>
     </div>

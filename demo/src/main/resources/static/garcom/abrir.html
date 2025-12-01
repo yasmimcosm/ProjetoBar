@@ -6,23 +6,34 @@
     <link rel="stylesheet" href="../css/styleLogin.css">
     <style>
         .card { max-width: 400px; margin:auto; background:#fff; padding:30px; border-radius:12px; }
-        input { width:100%; padding:10px; margin:10px 0; }
+        input, select { width:100%; padding:10px; margin:10px 0; }
     </style>
 </head>
-<body>
+<body id="abrir">
 
 <h1 style="text-align:center;">Abrir Mesa</h1>
-
 <button class="btn-login" onclick="history.back()">⬅ Voltar</button>
 
 <div class="card">
     <label>Número da mesa:</label>
-    <input id="numeroMesa" type="number">
+    <input id="numeroMesa" type="number" required>
 
     <label>Quantidade de pessoas:</label>
-    <input id="qtdPessoas" type="number">
+    <input id="qtdPessoas" type="number" required>
 
-    <button class="btn-login" onclick="abrirMesa()">Abrir</button>
+    <label>Pagar Couvert?</label>
+    <select id="pagarCouvert">
+        <option value="false">Não</option>
+        <option value="true">Sim</option>
+    </select>
+
+    <label>Couvert Individual?</label>
+    <select id="couvertIndividual">
+        <option value="false">Não</option>
+        <option value="true">Sim</option>
+    </select>
+
+    <button class="btn-login" onclick="abrirMesa()">Abrir Mesa</button>
 </div>
 
 <script src="../js/garcom.js"></script>
