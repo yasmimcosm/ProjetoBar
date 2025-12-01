@@ -1,5 +1,6 @@
 package com.example.demo.yasmimJose;
 import com.example.demo.yasmimJose.exception.*;
+import com.example.demo.yasmimJose.model.Item;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -224,7 +225,7 @@ public class Bar implements InterfaceBar {
                 totalGeral += valor;
                 gorjetaTotal += gorjeta;
 
-                Item item = new Item(0, nome, valorUnit, tipo); // id irrelevante aqui
+                Item item = new Item("0", nome, valorUnit, tipo); // id irrelevante aqui
                 extrato.add(new Consumo(item, qtd));
 
                 System.out.println(nome + " x" + qtd + " Valor unitário: R$" + valorUnit + " Total: R$" + valor);

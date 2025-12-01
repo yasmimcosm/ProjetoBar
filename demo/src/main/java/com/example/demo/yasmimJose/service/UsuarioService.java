@@ -1,5 +1,6 @@
 package com.example.demo.yasmimJose.service;
 
+import com.example.demo.yasmimJose.model.Papel;
 import com.example.demo.yasmimJose.model.Usuario;
 import com.example.demo.yasmimJose.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,14 +19,26 @@ public class UsuarioService {
         this.encoder = encoder;
     }
 
-    public Optional<Usuario> autenticar(String email, String senha) {
-        return repo.findByEmail(email)
-                .filter(u -> encoder.matches(senha, u.getSenhaHash()));
+    // autenticação apenas pela senha (pois não existe email / username)
+    public Optional<Usuario> autenticar(String senha) {
+
+        // autentica o administrador (exemplo simples)
+        Optional<Usuario> admin = repo.findByPapel(Papel.ADMIN);
+
+        // verifica senha usando BCrypt
+        return admin.filter(u -> encoder.matches(senha, u.getSenha()));
     }
 
-    public Usuario criarUsuario(String nome, String email, String senha, String papel) {
-        String hash = encoder.encode(senha);
-        Usuario u = new Usuario(nome, email, hash, papel);
-        return repo.save(u);
+    public Usuario criarUsuario(String senha, Papel papel) {
+        String senhaCriptografada = encoder.encode(senha);
+        Usuario usuario = new Usuario(senhaCriptografada, papel);
+        return repo.save(usuario);
+    }
+
+    // VERIFICAR SENHA DIRETO NO BANCO (SEM BCRYPT)
+    public boolean verificarSenha(String senha) {
+        Usuario user = repo.findBySenha(senha); // <--- AQUI ESTAVA O ERRO
+        return user != null;
     }
 }
+

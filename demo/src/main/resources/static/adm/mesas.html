@@ -5,9 +5,13 @@
     <title>Gerenciar Mesas</title>
     <link rel="stylesheet" href="../css/styleLogin.css">
     <style>
-        table { width: 100%; background: #fff; }
+        table { width: 100%; background: #fff; border-collapse: collapse; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; }
         .topo { margin-bottom: 20px; display: flex; justify-content: space-between; }
+        .btn-login { padding: 6px 12px; margin: 2px; cursor: pointer; border: none; border-radius: 5px; background: #007bff; color: white; }
+        .btn-login:hover { background: #0056b3; }
+        #modal { display: none; position: fixed; top: 20%; left: 35%; background: white; padding: 20px; border-radius: 10px; }
+        #modal input { width: 100%; padding: 8px; margin: 8px 0; }
     </style>
 </head>
 <body>
@@ -16,34 +20,116 @@
 
 <div class="topo">
     <button class="btn-login" onclick="history.back()">⬅ Voltar</button>
-    <button class="btn-login">Adicionar Mesa</button>
+    <button class="btn-login" onclick="abrirModalAdicionar()">Adicionar Mesa</button>
 </div>
 
-<table>
+<table id="tabela-mesas">
     <tr>
         <th>Número</th>
+        <th>Capacidade</th>
         <th>Status</th>
         <th>Ações</th>
     </tr>
-
-    <tr>
-        <td>1</td>
-        <td>Livre</td>
-        <td>
-            <button class="btn-login">Editar</button>
-            <button class="btn-login">Excluir</button>
-        </td>
-    </tr>
-
-    <tr>
-        <td>2</td>
-        <td>Ocupada</td>
-        <td>
-            <button class="btn-login">Editar</button>
-            <button class="btn-login">Excluir</button>
-        </td>
-    </tr>
 </table>
+
+<!-- Modal para adicionar/editar mesa -->
+<div id="modal">
+    <h3 id="modal-titulo">Nova Mesa</h3>
+    <input id="numero" type="number" placeholder="Número da mesa">
+    <input id="capacidade" type="number" placeholder="Capacidade">
+    <button onclick="salvarMesa()">Salvar</button>
+    <button onclick="fecharModal()">Cancelar</button>
+</div>
+
+<script>
+    const API = "http://localhost:8080/api/admin/mesas";
+    let editMesaId = null;
+
+    // Carregar mesas do banco
+    async function carregarMesas() {
+        const resp = await fetch(API);
+        const mesas = await resp.json();
+        const tabela = document.getElementById("tabela-mesas");
+        tabela.innerHTML = `
+            <tr>
+                <th>Número</th>
+                <th>Capacidade</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>`;
+
+        mesas.forEach(mesa => {
+            tabela.innerHTML += `
+                <tr>
+                    <td>${mesa.numero}</td>
+                    <td>${mesa.capacidade}</td>
+                    <td>${mesa.disponivel ? "LIVRE" : "OCUPADA"}</td>
+                    <td>
+                        <button class="btn-login" onclick="abrirModalEditar(${mesa.id}, ${mesa.numero}, ${mesa.capacidade})">Editar</button>
+                        <button class="btn-login" onclick="excluirMesa(${mesa.id})">Excluir</button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    // Abrir modal para adicionar
+    function abrirModalAdicionar() {
+        editMesaId = null;
+        document.getElementById("modal-titulo").textContent = "Nova Mesa";
+        document.getElementById("numero").value = "";
+        document.getElementById("capacidade").value = "";
+        document.getElementById("modal").style.display = "block";
+    }
+
+    // Abrir modal para editar
+    function abrirModalEditar(id, numero, capacidade) {
+        editMesaId = id;
+        document.getElementById("modal-titulo").textContent = "Editar Mesa";
+        document.getElementById("numero").value = numero;
+        document.getElementById("capacidade").value = capacidade;
+        document.getElementById("modal").style.display = "block";
+    }
+
+    // Fechar modal
+    function fecharModal() {
+        document.getElementById("modal").style.display = "none";
+    }
+
+    // Salvar nova mesa ou editar existente
+    async function salvarMesa() {
+        const mesa = {
+            numero: parseInt(document.getElementById("numero").value),
+            capacidade: parseInt(document.getElementById("capacidade").value)
+        };
+
+        let metodo = "POST";
+        let url = API;
+        if (editMesaId) {
+            metodo = "PUT";
+            url = `${API}/${editMesaId}`;
+        }
+
+        await fetch(url, {
+            method: metodo,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(mesa)
+        });
+
+        fecharModal();
+        carregarMesas();
+    }
+
+    // Excluir mesa
+    async function excluirMesa(id) {
+        if (confirm("Deseja realmente excluir esta mesa?")) {
+            await fetch(`${API}/${id}`, { method: "DELETE" });
+            carregarMesas();
+        }
+    }
+
+    // Carregar mesas ao iniciar
+    window.onload = carregarMesas;
+</script>
 
 </body>
 </html>

@@ -5,30 +5,39 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "mesa")
 public class Mesa {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private Integer numero;
 
+    @Column(nullable = false)
     private Integer capacidade;
-    private String status; // LIVRE, OCUPADA
 
+    @Column(nullable = false)
+    private Boolean disponivel = true; // true = LIVRE, false = OCUPADA
+
+    // Construtores
     public Mesa() {}
+
     public Mesa(Integer numero, Integer capacidade) {
         this.numero = numero;
         this.capacidade = capacidade;
-        this.status = "LIVRE";
+        this.disponivel = true;
     }
 
-    // getters e setters
+    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
     public Integer getNumero() { return numero; }
     public void setNumero(Integer numero) { this.numero = numero; }
+
     public Integer getCapacidade() { return capacidade; }
     public void setCapacidade(Integer capacidade) { this.capacidade = capacidade; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+
+    public Boolean getDisponivel() { return disponivel; }
+    public void setDisponivel(Boolean disponivel) { this.disponivel = disponivel; }
 }

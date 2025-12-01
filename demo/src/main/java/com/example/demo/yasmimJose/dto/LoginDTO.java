@@ -1,6 +1,13 @@
 package com.example.demo.yasmimJose.dto;
 
 public class LoginDTO {
-    public String email;
-    public String senha;
+    private String senha;
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
 }
