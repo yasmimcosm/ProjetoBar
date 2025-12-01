@@ -189,3 +189,37 @@ async function cancelarPedido(pedidoId) {
     alert("Pedido cancelado!");
     carregarPedidos();
 }
+
+const garcomCadastrado = {
+    usuario: "joao",
+    senha: "1234"
+};
+
+async function verificarGarcom() {
+    const senha = document.getElementById("senha").value;
+
+    try {
+        const resp = await fetch("http://localhost:8080/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ senha: senha })
+        });
+
+        if (!resp.ok) {
+            document.getElementById("msg").textContent = "Erro ao conectar!";
+            return;
+        }
+
+        const result = await resp.json();
+
+        if (result.autorizado === true) {
+            window.location.href = "/garcom/garcomEntrada.html";
+        } else {
+            document.getElementById("msg").textContent = "Usuário ou senha incorretos!";
+        }
+
+    } catch (error) {
+        document.getElementById("msg").textContent = "Erro de conexão!";
+        console.error(error);
+    }
+}

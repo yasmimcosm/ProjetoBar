@@ -10,5 +10,10 @@ public class PaginaController {
     public String adminSenha() {
         return "adminSenha"; // abre adminSenha.html em templates
     }
+
+    @GetMapping("/garcomSenha")
+    public String garcomSenha() {
+        return "garcomSenha";
+    }
 }
 
